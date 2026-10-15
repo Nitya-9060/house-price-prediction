@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HomeValue AI – Smart House Price Prediction</title>
+  <meta name="description" content="AI-powered property valuation simulator. Enter property details and get an estimated market value instantly." />
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Shared SVG gradient used by confidence/score meters -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <linearGradient id="hvGradStroke" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#2563eb" /><stop offset="0.55" stop-color="#7c3aed" /><stop offset="1" stop-color="#06b6d4" />
+      </linearGradient>
+    </defs>
+  </svg>
+
+  <!-- ============ TOP NAVIGATION ============ -->
+  <header class="navbar" id="navbar">
+    <div class="nav-inner">
+      <a href="#dashboard" class="brand" data-page-link="dashboard" aria-label="HomeValue AI home">
+        <span class="brand-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9.5 21v-6h5v6"/></svg>
+        </span>
+        <span class="brand-text">HomeValue <span class="brand-accent">AI</span></span>
+      </a>
+
+      <nav class="nav-links" id="navLinks" aria-label="Main navigation">
+        <a href="#dashboard" data-page-link="dashboard" class="nav-link active">Dashboard</a>
+        <a href="#predict" data-page-link="predict" class="nav-link">Predict Price</a>
+        <a href="#analytics" data-page-link="analytics" class="nav-link">Analytics</a>
+        <a href="#how" data-page-link="how" class="nav-link">How It Works</a>
+        <a href="#about" data-page-link="about" class="nav-link">About</a>
+      </nav>
+
+      <div class="nav-actions">
+        <span class="ai-status" title="Simulated model status indicator (demo)" data-tooltip="Demo indicator – the prediction engine is a JavaScript simulation">
+          <span class="pulse-dot" aria-hidden="true"></span> AI Model Online
+        </span>
+        <button class="icon-btn" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark / light mode" data-tooltip="Switch between light and dark themes">
+          <svg class="icon-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+        </button>
+        <button class="icon-btn hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false" title="Menu">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+
+  <!-- ============ DASHBOARD PAGE ============ -->
+  <section class="page active" id="page-dashboard" aria-label="Dashboard">
+    <div class="hero">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <span class="badge">
+            <span class="pulse-dot"></span> Simulation Mode · Academic Prototype
+          </span>
+          <h1>Predict Your Property's Value with <span class="grad-text">AI</span></h1>
+          <p class="sub">Get an intelligent estimate of your home's market value using property features and machine-learning inspired analytics.</p>
+          <div class="hero-cta">
+            <button class="btn btn-primary btn-lg" data-page-link="predict" id="heroPredictBtn">
+              Predict Property Value
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </button>
+            <button class="btn btn-ghost btn-lg" data-page-link="analytics">Explore Analytics</button>
+          </div>
+
+          <div class="hero-stats">
+            <div class="stat-card float-1" data-tooltip="Simulated demo metric – not from a real trained model">
+              <div class="stat-icon si-cyan">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M21 3h-6M21 3v6"/></svg>
+              </div>
+              <div>
+                <div class="stat-num"><span class="counter" data-target="98.4" data-decimals="1">0</span>%</div>
+                <div class="stat-label">Model Accuracy <span class="demo-tag">demo</span></div>
+              </div>
+            </div>
+            <div class="stat-card float-2" data-tooltip="Simulated demo metric">
+              <div class="stat-icon si-blue">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg>
+              </div>
+              <div>
+                <div class="stat-num"><span class="counter" data-target="12" data-suffix="K+">0</span></div>
+                <div class="stat-label">Properties Analyzed <span class="demo-tag">demo</span></div>
+              </div>
+            </div>
+            <div class="stat-card float-3" data-tooltip="Simulated demo metric">
+              <div class="stat-icon si-purple">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg>
+              </div>
+              <div>
+                <div class="stat-num">&lt; <span class="counter" data-target="2">0</span> sec</div>
+                <div class="stat-label">Prediction Time <span class="demo-tag">demo</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-art" aria-hidden="true">
+          <div class="art-orb orb-1"></div>
+          <div class="art-orb orb-2"></div>
+          <img src="assets/house.svg" alt="" class="hero-house" width="520" height="420" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard feature strip -->
+    <div class="container section">
+      <div class="section-head">
+        <h2>Everything you need for a smart valuation</h2>
+        <p>Thirteen property features feed the simulated valuation engine, instantly.</p>
+      </div>
+      <div class="feature-grid">
+        <div class="feature-card reveal">
+          <div class="feature-icon fi-1">🏠</div>
+          <h3>Smart Input Form</h3>
+          <p>Location, area, rooms, furnishing, condition and amenities — every field affects the estimate.</p>
+        </div>
+        <div class="feature-card reveal delay-1">
+          <div class="feature-icon fi-2">📊</div>
+          <h3>Interactive Charts</h3>
+          <p>Doughnut breakdown, market comparison, area–price trend and feature-impact visuals.</p>
+        </div>
+        <div class="feature-card reveal delay-2">
+          <div class="feature-icon fi-3">🤖</div>
+          <h3>Demo ML Simulation</h3>
+          <p>A transparent, formula-based engine that mimics a gradient-boosting regression pipeline.</p>
+        </div>
+        <div class="feature-card reveal delay-3">
+          <div class="feature-icon fi-4">💾</div>
+          <h3>History & Reports</h3>
+          <p>Predictions are saved in your browser, with one-click reports you can download or share.</p>
+        </div>
+      </div>
+
+      <div class="demo-strip">
+        <p class="demo-strip-label">Try a demo scenario:</p>
+        <button class="btn btn-chip" data-scenario="budget">🏠 Budget Home</button>
+        <button class="btn btn-chip" data-scenario="family">🏘️ Family Home</button>
+        <button class="btn btn-chip" data-scenario="luxury">🏖️ Luxury Villa</button>
+        <button class="btn btn-chip chip-accent" id="autoDemoBtn">⚡ Auto Demo</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PREDICT PAGE ============ -->
+  <section class="page" id="page-predict" aria-label="AI Property Valuation">
+    <div class="container section">
+      <div class="section-head">
+        <h1 class="page-title">AI Property Valuation</h1>
+        <p>Enter your property details below — the simulated engine estimates market value in seconds. <span class="badge badge-inline">Simulation Mode</span></p>
+      </div>
+
+      <div class="predict-layout">
+        <!-- FORM -->
+        <form class="card form-card" id="predictForm" novalidate>
+          <h2 class="form-title"><span class="form-icon">📝</span> Property Information</h2>
+
+          <div class="demo-strip demo-strip-compact">
+            <span class="demo-strip-label">Demo scenarios:</span>
+            <button type="button" class="btn btn-chip" data-scenario="budget">Budget</button>
+            <button type="button" class="btn btn-chip" data-scenario="family">Family</button>
+            <button type="button" class="btn btn-chip" data-scenario="luxury">Luxury</button>
+          </div>
+
+          <div class="form-grid">
+            <div class="field">
+              <label for="location">Location <span class="req">*</span></label>
+              <div class="select-wrap">
+                <span class="field-icon" aria-hidden="true">📍</span>
+                <select id="location" name="location" required>
+                  <option value="">Select a city</option>
+                  <option>Delhi</option><option>Mumbai</option><option>Bangalore</option>
+                  <option>Hyderabad</option><option>Chennai</option><option>Kolkata</option>
+                  <option>Pune</option><option>Ranchi</option><option>Patna</option><option>Other</option>
+                </select>
+                <span class="select-arrow" aria-hidden="true">▾</span>
+              </div>
+              <span class="helper">Demo price-per-sqft values vary by city</span>
+              <p class="error-msg" id="err-location" role="alert"></p>
+            </div>
+
+            <div class="field">
+              <label for="propertyType">Property Type <span class="req">*</span></label>
+              <div class="select-wrap">
+                <span class="field-icon" aria-hidden="true">🏢</span>
+                <select id="propertyType" name="propertyType" required>
+                  <option value="">Select type</option>
+                  <option>Apartment</option><option>Independent House</option>
+                  <option>Villa</option><option>Penthouse</option>
+                </select>
+                <span class="select-arrow" aria-hidden="true">▾</span>
+              </div>
+              <span class="helper">Type changes the valuation multiplier</span>
+              <p class="error-msg" id="err-propertyType" role="alert"></p>
+            </div>
+
+            <div class="field">
+              <label for="area">Built-up Area (sq ft) <span class="req">*</span></label>
+              <div class="input-wrap">
+                <span class="field-icon" aria-hidden="true">📐</span>
+                <input type="number" id="area" name="area" min="100" max="100000" step="10" placeholder="e.g. 1500" required inputmode="numeric" />
+                <span class="unit">sq ft</span>
+              </div>
+              <span class="helper">Between 100 and 1,00,000 sq ft</span>
+              <p class="error-msg" id="err-area" role="alert"></p>
+            </div>
+
+            <div class="field">
+              <label for="propertyAge">Property Age (years) <span class="req">*</span></label>
+              <div class="input-wrap">
+                <span class="field-icon" aria-hidden="true">🕰️</span>
+                <input type="number" id="propertyAge" name="propertyAge" min="0" max="100" step="1" placeholder="e.g. 5" required inputmode="numeric" />
+                <span class="unit">yrs</span>
+              </div>
+              <span class="helper">Value depreciates gradually with age</span>
+              <p class="error-msg" id="err-propertyAge" role="alert"></p>
+            </div>
+
+            <div class="field">
+              <label for="bedrooms">Bedrooms <span class="req">*</span></label>
+              <div class="stepper" data-target="bedrooms">
+                <button type="button" class="step-btn" data-step="-1" aria-label="Decrease bedrooms">−</button>
+                <span class="field-icon" aria-hidden="true">🛏️</span>
+                <input type="text" id="bedrooms" value="2" readonly aria-live="polite" />
+                <button type="button" class="step-btn" data-step="1" aria-label="Increase bedrooms">+</button>
+              </div>
+              <span class="helper">1 – 6+ BHK</span>
+              <p class="error-msg" id="err-bedrooms" role="alert"></p>
+            </div>
+
+            <div class="field">
+              <label for="bathrooms">Bathrooms <span class="req">*</span></label>
+              <div class="stepper" data-target="bathrooms">
+                <button type="button" class="step-btn" data-step="-1" aria-label="Decrease bathrooms">−</button>
+                <span class="field-icon" aria-hidden="true">🛁</span>
+                <input type="text" id="bathrooms" value="1" readonly aria-live="polite" />
+                <button type="button" class="step-btn" data-step="1" aria-label="Increase bathrooms">+</button>
+              </div>
+              <span class="helper">1 – 5+ bathrooms</span>
+              <p class="error-msg" id="err-bathrooms" role="alert"></p>
+            </div>
+
+            <div class="field">
+              <label for="floors">Total Floors</label>
+              <div class="input-wrap">
+                <span class="field-icon" aria-hidden="true">🏗️</span>
+                <input type="number" id="floors" name="floors" min="1" max="60" placeholder="e.g. 4" inputmode="numeric" />
+              </div>
+              <span class="helper">Optional — floors in the building</span>
+            </div>
+
+            <div class="field">
+              <label for="floorPref">Floor Preference</label>
+              <div class="select-wrap">
+                <span class="field-icon" aria-hidden="true">🪜</span>
+                <select id="floorPref" name="floorPref">
+                  <option>Ground</option><option>Middle</option><option>Top</option>
+                </select>
+                <span class="select-arrow" aria-hidden="true">▾</span>
+              </div>
+              <span class="helper">Top & middle floors carry a small premium</span>
+            </div>
+
+            <div class="field">
+              <label for="parking">Parking</label>
+              <div class="select-wrap">
+                <span class="field-icon" aria-hidden="true">🚗</span>
+                <select id="parking" name="parking">
+                  <option>No Parking</option><option>1 Car</option><option>2 Cars</option><option>3+ Cars</option>
+                </select>
+                <span class="select-arrow" aria-hidden="true">▾</span>
+              </div>
+              <span class="helper">More covered parking = higher value</span>
+            </div>
+
+            <div class="field">
+              <label for="furnishing">Furnished Status</label>
+              <div class="select-wrap">
+                <span class="field-icon" aria-hidden="true">🛋️</span>
+                <select id="furnishing" name="furnishing">
+                  <option>Unfurnished</option><option selected>Semi-Furnished</option><option>Fully Furnished</option>
+                </select>
+                <span class="select-arrow" aria-hidden="true">▾</span>
+              </div>
+              <span class="helper">Furnishing multiplier applied to base</span>
+            </div>
+
+            <div class="field">
+              <label for="condition">Property Condition</label>
+              <div class="select-wrap">
+                <span class="field-icon" aria-hidden="true">🧰</span>
+                <select id="condition" name="condition">
+                  <option>Needs Renovation</option><option>Average</option><option selected>Good</option><option>Excellent</option>
+                </select>
+                <span class="select-arrow" aria-hidden="true">▾</span>
+              </div>
+              <span class="helper">Condition adjusts the final estimate</span>
+            </div>
+
+            <div class="field">
+              <label for="balcony">Balcony</label>
+              <div class="select-wrap">
+                <span class="field-icon" aria-hidden="true">🌤️</span>
+                <select id="balcony" name="balcony">
+                  <option>No</option><option selected>1</option><option>2</option><option>3+</option>
+                </select>
+                <span class="select-arrow" aria-hidden="true">▾</span>
+              </div>
+              <span class="helper">Balconies add light & value</span>
+            </div>
+
+            <div class="field field-full">
+              <label id="amenities-label">Nearby Facilities <span class="req">*</span></label>
+              <div class="checkbox-row" role="group" aria-labelledby="amenities-label">
+                <label class="check-pill"><input type="checkbox" name="amenity" value="Metro" /><span>🚇 Metro</span></label>
+                <label class="check-pill"><input type="checkbox" name="amenity" value="School" /><span>🏫 School</span></label>
+                <label class="check-pill"><input type="checkbox" name="amenity" value="Hospital" /><span>🏥 Hospital</span></label>
+                <label class="check-pill"><input type="checkbox" name="amenity" value="Shopping Mall" /><span>🛍️ Mall</span></label>
+                <label class="check-pill"><input type="checkbox" name="amenity" value="Airport" /><span>✈️ Airport</span></label>
+                <label class="check-pill"><input type="checkbox" name="amenity" value="Park" /><span>🌳 Park</span></label>
+              </div>
+              <span class="helper">Pick everything available nearby — each adds a small premium</span>
+              <p class="error-msg" id="err-amenities" role="alert"></p>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-xl btn-predict" id="predictBtn">
+            <span class="btn-label">✨ Predict House Price</span>
+          </button>
+          <div class="form-footer-links">
+            <button type="button" class="btn btn-text" id="resetBtn">↺ New Prediction (Reset)</button>
+            <button type="button" class="btn btn-text" id="autoDemoBtnForm">⚡ Auto Demo</button>
+          </div>
+        </form>
+
+        <!-- RESULTS -->
+        <div class="results-col" id="resultsCol">
+          <!-- Loading state -->
+          <div class="card loading-card hidden" id="loadingCard" aria-live="polite">
+            <div class="ai-loader">
+              <div class="loader-ring"></div>
+              <div class="loader-ring ring-2"></div>
+              <span class="loader-brain" aria-hidden="true">🤖</span>
+            </div>
+            <h3 id="loadingTitle">Analyzing property features...</h3>
+            <div class="loading-steps" id="loadingSteps">
+              <div class="loading-step"><span class="step-check"></span> Analyzing property features...</div>
+              <div class="loading-step"><span class="step-check"></span> Comparing market patterns...</div>
+              <div class="loading-step"><span class="step-check"></span> Running AI valuation model...</div>
+              <div class="loading-step"><span class="step-check"></span> Generating prediction...</div>
+            </div>
+          </div>
+
+          <!-- Empty state -->
+          <div class="card empty-card" id="emptyCard">
+            <div class="empty-art" aria-hidden="true">🔍</div>
+            <h3>No prediction yet</h3>
+            <p>Fill in the property form and hit <strong>✨ Predict House Price</strong>. Results, charts and scores appear here.</p>
+            <button type="button" class="btn btn-primary" id="autoDemoBtnEmpty">⚡ Run Auto Demo</button>
+          </div>
+
+          <!-- Result dashboard -->
+          <div class="results hidden" id="resultsWrap">
+            <!-- Result card -->
+            <div class="card result-card reveal">
+              <div class="result-card-head">
+                <h2>Estimated Property Value</h2>
+                <span class="badge badge-inline">Demo ML Simulation</span>
+              </div>
+              <div class="price-main">
+                <span class="price-currency">₹</span>
+                <span id="finalPrice" class="price-value">0</span>
+              </div>
+              <p class="price-caption">Estimated Market Price</p>
+              <div class="result-meta-row">
+                <div class="result-meta">
+                  <span class="meta-label">Prediction Range</span>
+                  <span class="meta-value" id="priceRange">—</span>
+                </div>
+                <div class="result-meta">
+                  <span class="meta-label">Price / sq ft</span>
+                  <span class="meta-value" id="pricePerSqft">—</span>
+                </div>
+              </div>
+              <div class="confidence-row">
+                <div class="conf-meter" id="confMeter" role="img" aria-label="Confidence meter">
+                  <svg viewBox="0 0 120 120" class="conf-svg">
+                    <circle cx="60" cy="60" r="52" class="conf-track" />
+                    <circle cx="60" cy="60" r="52" class="conf-fill" id="confArc" />
+                  </svg>
+                  <div class="conf-center"><span id="confValue">0%</span><small>Confidence</small></div>
+                </div>
+                <div class="conf-text">
+                  <p id="confMessage">Your property is estimated to have a strong market value based on the selected features.</p>
+                  <p class="fine-print">Confidence is computed from feature completeness & typicality (demo heuristic, 85–97%).</p>
+                </div>
+              </div>
+              <div class="result-actions">
+                <button class="btn btn-primary" id="saveBtn">💾 Save Prediction</button>
+                <button class="btn btn-secondary" id="downloadBtn">⬇️ Download Report</button>
+                <button class="btn btn-secondary" id="shareBtn">🔗 Share Result</button>
+                <button class="btn btn-ghost" id="newPredictionBtn">↺ New Prediction</button>
+              </div>
+            </div>
+
+            <!-- AI model explanation -->
+            <div class="card model-card reveal">
+              <div class="model-card-head">
+                <h2>🤖 AI Model Explanation</h2>
+                <span class="badge badge-warn">Demo ML Simulation</span>
+              </div>
+              <div class="model-grid">
+                <div class="model-item"><span class="mi-label">Model</span><span class="mi-value">House Price Prediction Model</span></div>
+                <div class="model-item"><span class="mi-label">Model Type</span><span class="mi-value">Regression / Gradient Boosting Simulation</span></div>
+                <div class="model-item"><span class="mi-label">Features Used</span><span class="mi-value">13+</span></div>
+                <div class="model-item"><span class="mi-label">Prediction Time</span><span class="mi-value" id="modelTime">~1.2 seconds</span></div>
+                <div class="model-item"><span class="mi-label">Confidence</span><span class="mi-value" id="modelConf">—</span></div>
+                <div class="model-item"><span class="mi-label">Engine</span><span class="mi-value">Client-side JS feature-weighted regression (simulated)</span></div>
+              </div>
+              <p class="fine-print">Note: this prototype runs a transparent JavaScript formula that <em>simulates</em> a trained ML model — no real model is served. See the "Future ML backend" notes on the About page.</p>
+            </div>
+
+            <!-- Price breakdown -->
+            <div class="card breakdown-card reveal">
+              <h2>Price Breakdown</h2>
+              <div class="breakdown-rows" id="breakdownRows"></div>
+              <div class="breakdown-total">
+                <span>Final Estimated Value</span>
+                <span id="breakdownFinal">—</span>
+              </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="card chart-card reveal">
+              <h2>Price Composition</h2>
+              <div class="chart-box"><canvas id="chartDoughnut" aria-label="Doughnut chart of price composition" role="img"></canvas></div>
+            </div>
+            <div class="card chart-card reveal">
+              <h2>Price Comparison</h2>
+              <div class="chart-box"><canvas id="chartBar" aria-label="Bar chart comparing property prices" role="img"></canvas></div>
+            </div>
+            <div class="card chart-card reveal">
+              <h2>Area vs Price Trend</h2>
+              <div class="chart-box"><canvas id="chartLine" aria-label="Line chart of area versus price" role="img"></canvas></div>
+            </div>
+            <div class="card chart-card reveal">
+              <h2>Feature Impact</h2>
+              <div class="chart-box"><canvas id="chartRadar" aria-label="Bar chart of feature impact" role="img"></canvas></div>
+            </div>
+
+            <!-- Property score -->
+            <div class="card score-card reveal">
+              <h2>AI Property Score</h2>
+              <div class="score-main-ring">
+                <div class="conf-meter big" id="scoreMeter" role="img" aria-label="Overall property score">
+                  <svg viewBox="0 0 120 120" class="conf-svg">
+                    <circle cx="60" cy="60" r="52" class="conf-track" />
+                    <circle cx="60" cy="60" r="52" class="conf-fill score-fill" id="scoreArc" />
+                  </svg>
+                  <div class="conf-center"><span id="scoreValue">0</span><small>/ 100</small></div>
+                </div>
+                <div class="score-subtitle">Overall AI Property Score</div>
+              </div>
+              <div class="score-grid" id="scoreGrid">
+                <div class="score-item" data-score="location"><div class="mini-ring"><span class="mini-val">0</span></div><span class="score-name">Location Score</span></div>
+                <div class="score-item" data-score="property"><div class="mini-ring"><span class="mini-val">0</span></div><span class="score-name">Property Score</span></div>
+                <div class="score-item" data-score="amenities"><div class="mini-ring"><span class="mini-val">0</span></div><span class="score-name">Amenities Score</span></div>
+                <div class="score-item" data-score="condition"><div class="mini-ring"><span class="mini-val">0</span></div><span class="score-name">Condition Score</span></div>
+                <div class="score-item" data-score="market"><div class="mini-ring"><span class="mini-val">0</span></div><span class="score-name">Market Score</span></div>
+              </div>
+            </div>
+
+            <!-- Market insights -->
+            <div class="insight-grid reveal">
+              <div class="insight-card">
+                <span class="insight-icon">📈</span>
+                <h3>Price Trend</h3>
+                <p class="insight-value" id="insTrend">Positive</p>
+                <p class="insight-sub" id="insTrendSub">Demo estimate</p>
+              </div>
+              <div class="insight-card">
+                <span class="insight-icon">🏙️</span>
+                <h3>Location Demand</h3>
+                <p class="insight-value" id="insDemand">High</p>
+                <p class="insight-sub" id="insDemandSub">Demo estimate</p>
+              </div>
+              <div class="insight-card">
+                <span class="insight-icon">🏠</span>
+                <h3>Property Demand</h3>
+                <p class="insight-value" id="insPropDemand">Strong</p>
+                <p class="insight-sub" id="insPropDemandSub">Demo estimate</p>
+              </div>
+              <div class="insight-card">
+                <span class="insight-icon">💰</span>
+                <h3>Investment Potential</h3>
+                <p class="insight-value" id="insInvest">Good</p>
+                <p class="insight-sub" id="insInvestSub">Demo estimate</p>
+              </div>
+              <div class="insight-card wide">
+                <span class="insight-icon">🧮</span>
+                <h3>Estimated price per sq ft</h3>
+                <p class="insight-value" id="insPerSqft">—</p>
+                <p class="insight-sub">Demo estimate (final price ÷ area)</p>
+              </div>
+              <div class="insight-card wide">
+                <span class="insight-icon">🚀</span>
+                <h3>Estimated annual appreciation</h3>
+                <p class="insight-value" id="insApprec">—</p>
+                <p class="insight-sub">Demo estimate, not a guarantee</p>
+              </div>
+            </div>
+
+            <!-- Property summary -->
+            <div class="card summary-card reveal">
+              <h2>Property Summary</h2>
+              <dl class="summary-grid" id="summaryGrid"></dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Prediction history -->
+      <div class="card history-card" id="historyCard">
+        <div class="history-head">
+          <h2>🕘 Recent Predictions</h2>
+          <button class="btn btn-danger-ghost btn-sm" id="clearHistoryBtn">🗑️ Clear History</button>
+        </div>
+        <p class="history-note">Saved locally in your browser (localStorage). Nothing leaves your device.</p>
+        <div id="historyList" class="history-list"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ANALYTICS PAGE ============ -->
+  <section class="page" id="page-analytics" aria-label="Analytics">
+    <div class="container section">
+      <div class="section-head">
+        <h1 class="page-title">Analytics Dashboard</h1>
+        <p>Market analytics computed from a built-in demo dataset of <strong id="datasetCount">18</strong> sample properties <span class="badge badge-inline">Demo Dataset</span></p>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card reveal">
+          <span class="kpi-icon">🧾</span>
+          <div><div class="kpi-num"><span class="counter" id="kpiTotal">0</span></div><div class="kpi-label">Total Predictions (demo)</div></div>
+        </div>
+        <div class="kpi-card reveal delay-1">
+          <span class="kpi-icon">💰</span>
+          <div><div class="kpi-num" id="kpiAvgPrice">₹0</div><div class="kpi-label">Average Predicted Price</div></div>
+        </div>
+        <div class="kpi-card reveal delay-2">
+          <span class="kpi-icon">📍</span>
+          <div><div class="kpi-num" id="kpiTopLoc">—</div><div class="kpi-label">Most Selected Location</div></div>
+        </div>
+        <div class="kpi-card reveal delay-3">
+          <span class="kpi-icon">📐</span>
+          <div><div class="kpi-num" id="kpiAvgArea">0 sq ft</div><div class="kpi-label">Average Property Size</div></div>
+        </div>
+      </div>
+
+      <div class="analytics-grid">
+        <div class="card chart-card reveal"><h2>Price by Location</h2><div class="chart-box tall"><canvas id="chartLocPrice" role="img" aria-label="Bar chart of average price by location"></canvas></div></div>
+        <div class="card chart-card reveal delay-1"><h2>Avg Price by Property Type</h2><div class="chart-box tall"><canvas id="chartTypePrice" role="img" aria-label="Bar chart of average price by property type"></canvas></div></div>
+        <div class="card chart-card reveal"><h2>Area vs Price</h2><div class="chart-box tall"><canvas id="chartAreaPrice" role="img" aria-label="Scatter chart of area versus price"></canvas></div></div>
+        <div class="card chart-card reveal delay-1"><h2>Prediction Distribution</h2><div class="chart-box tall"><canvas id="chartDistribution" role="img" aria-label="Doughnut chart of price bracket distribution"></canvas></div></div>
+      </div>
+
+      <div class="card table-card reveal">
+        <h2>Demo Dataset</h2>
+        <div class="table-scroll">
+          <table class="data-table" id="datasetTable">
+            <thead><tr><th>#</th><th>Location</th><th>Type</th><th>Area (sq ft)</th><th>BHK</th><th>Est. Price</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ HOW IT WORKS PAGE ============ -->
+  <section class="page" id="page-how" aria-label="How it works">
+    <div class="container section">
+      <div class="section-head">
+        <h1 class="page-title">How It Works</h1>
+        <p>From raw property features to an estimated value — in four steps.</p>
+      </div>
+
+      <div class="steps-grid">
+        <div class="step-card reveal">
+          <div class="step-num">STEP 1</div>
+          <div class="step-icon">📝</div>
+          <h3>Enter Property Details</h3>
+          <p>Fill location, area, rooms, furnishing, condition, parking and nearby facilities.</p>
+        </div>
+        <div class="step-card reveal delay-1">
+          <div class="step-num">STEP 2</div>
+          <div class="step-icon">⚙️</div>
+          <h3>Feature Processing</h3>
+          <p>Inputs are validated and converted into numeric features with weights & multipliers.</p>
+        </div>
+        <div class="step-card reveal delay-2">
+          <div class="step-num">STEP 3</div>
+          <div class="step-icon">🤖</div>
+          <h3>AI Prediction</h3>
+          <p>The simulated regression engine combines all 13+ features into one value estimate.</p>
+        </div>
+        <div class="step-card reveal delay-3">
+          <div class="step-num">STEP 4</div>
+          <div class="step-icon">✨</div>
+          <h3>Get Estimated Value</h3>
+          <p>Instant price, range, confidence, score, charts and a downloadable report.</p>
+        </div>
+      </div>
+
+      <div class="card pipeline-card reveal">
+        <h2>Machine Learning Pipeline (simulated)</h2>
+        <p class="fine-print">Hover or tap any stage for details. This mirrors the pipeline a real Python backend would use.</p>
+        <div class="pipeline" id="pipeline">
+          <div class="pipe-stage" tabindex="0" data-tip="Raw inputs collected from the form: numeric, categorical and boolean features.">
+            <span class="pipe-icon">🏠</span> Property Data
+          </div>
+          <div class="pipe-arrow" aria-hidden="true">↓</div>
+          <div class="pipe-stage" tabindex="0" data-tip="Validation, missing-value handling, outlier clamping (e.g. area 100–100k sq ft).">
+            <span class="pipe-icon">🧹</span> Data Cleaning
+          </div>
+          <div class="pipe-arrow" aria-hidden="true">↓</div>
+          <div class="pipe-stage" tabindex="0" data-tip="Encoding categories (location, type), building ratios (bedroom density) and amenity counts.">
+            <span class="pipe-icon">⚙️</span> Feature Engineering
+          </div>
+          <div class="pipe-arrow" aria-hidden="true">↓</div>
+          <div class="pipe-stage" tabindex="0" data-tip="In a real system: train/test split (80/20) with cross-validation to avoid overfitting.">
+            <span class="pipe-icon">🔀</span> Train/Test Split
+          </div>
+          <div class="pipe-arrow" aria-hidden="true">↓</div>
+          <div class="pipe-stage" tabindex="0" data-tip="Gradient Boosting / Random Forest / XGBoost regressor trained on historical prices.">
+            <span class="pipe-icon">🤖</span> Regression Model
+          </div>
+          <div class="pipe-arrow" aria-hidden="true">↓</div>
+          <div class="pipe-stage" tabindex="0" data-tip="The model outputs the estimated price with a confidence interval.">
+            <span class="pipe-icon">📊</span> Prediction
+          </div>
+          <div class="pipe-arrow" aria-hidden="true">↓</div>
+          <div class="pipe-stage" tabindex="0" data-tip="Result displayed with breakdown, score, charts and report.">
+            <span class="pipe-icon">✨</span> Estimated House Price
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ABOUT PAGE ============ -->
+  <section class="page" id="page-about" aria-label="About project">
+    <div class="container section">
+      <div class="section-head">
+        <h1 class="page-title">About Project</h1>
+        <p>AI-Based House Price Prediction — an academic prototype.</p>
+      </div>
+
+      <div class="about-grid">
+        <div class="card about-card reveal">
+          <h2>🎯 Objective</h2>
+          <p>To estimate property prices based on property characteristics and location, using a transparent, ML-inspired simulation that could later be replaced by a real trained model.</p>
+        </div>
+        <div class="card about-card reveal delay-1">
+          <h2>🧰 Technologies</h2>
+          <ul class="tech-list">
+            <li>HTML5</li><li>CSS3</li><li>JavaScript (ES6+)</li><li>Chart.js</li><li>localStorage</li><li>Machine Learning Concepts</li>
+          </ul>
+        </div>
+        <div class="card about-card reveal delay-2">
+          <h2>🔬 How the simulation works</h2>
+          <p>Base price = area × city price-per-sqft, then multiplicative and additive adjustments for type, rooms, furnishing, condition, age, parking, floor and amenities — a feature-weighted linear/boosting-style blend.</p>
+        </div>
+        <div class="card about-card reveal delay-3">
+          <h2>🚀 Future Scope</h2>
+          <ul class="future-list">
+            <li>Real trained ML model (scikit-learn / XGBoost)</li>
+            <li>Live real-estate datasets</li>
+            <li>Location & map APIs</li>
+            <li>Property image analysis (CNN)</li>
+            <li>Deep learning price models</li>
+            <li>Real-time market data feeds</li>
+            <li>User accounts & saved portfolios</li>
+            <li>Cloud deployment (Docker + cloud hosting)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card about-card reveal">
+        <h2>🛠️ Connecting a Real ML Backend Later</h2>
+        <p>The current JavaScript engine sits in one function (<code>computeValuation()</code> in <code>script.js</code>). To swap in a real model:</p>
+        <ol class="ml-steps">
+          <li><strong>Train</strong> a regressor (Random Forest, Gradient Boosting or XGBoost) with pandas/NumPy/scikit-learn on real sales data; export with <code>joblib</code> as <code>model.pkl</code>.</li>
+          <li><strong>Serve</strong> it with FastAPI or Flask behind a <code>POST /predict</code> endpoint that accepts the same JSON feature object.</li>
+          <li><strong>Call</strong> the endpoint from the browser with <code>fetch('/predict', {method:'POST', body: JSON.stringify(features)})</code> and render the returned price exactly as the simulation does now.</li>
+        </ol>
+        <div class="code-block"><pre>Frontend (HTML/JS)
+      ↓ fetch POST /predict
+FastAPI / Flask server
+      ↓
+Python · Pandas · NumPy
+      ↓
+Scikit-learn / XGBoost
+      ↓ trained model (model.pkl)
+Prediction → Estimated House Price</pre></div>
+      </div>
+    </div>
+  </section>
+
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <span class="brand-text">HomeValue <span class="brand-accent">AI</span></span>
+        <p>Smart Property Valuation Using AI</p>
+        <p class="fine-print">Built as an AI/ML academic project.</p>
+      </div>
+      <nav class="footer-links" aria-label="Footer">
+        <button data-page-link="dashboard">Dashboard</button>
+        <button data-page-link="predict">Predict</button>
+        <button data-page-link="analytics">Analytics</button>
+        <button data-page-link="how">How It Works</button>
+        <button data-page-link="about">About</button>
+      </nav>
+    </div>
+    <div class="container footer-bottom">
+      <p class="disclaimer">⚠️ Disclaimer: This application is an academic/demo simulation. Property values shown are estimated using simulated assumptions and should not be treated as professional real-estate valuations.</p>
+      <p class="fine-print">© <span id="year"></span> HomeValue AI · Academic Prototype · All predictions simulated</p>
+    </div>
+  </footer>
+
+  <!-- Toasts -->
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <!-- View-history modal -->
+  <div class="modal-overlay hidden" id="historyModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal card">
+      <div class="modal-head">
+        <h3 id="modalTitle">Saved Prediction</h3>
+        <button class="icon-btn" id="modalClose" aria-label="Close dialog">✕</button>
+      </div>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <script src="assets/chart.umd.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
